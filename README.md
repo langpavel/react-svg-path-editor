@@ -2,6 +2,8 @@
 
 An empty [Este.js](https://github.com/este/este) app for quick bootstrapping.
 
+Current state: Not actual.
+
 ## Create App
 
 ```shell
