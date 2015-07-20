@@ -1,50 +1,52 @@
 import './app.styl';
 import Component from '../components/component.react';
-// import Footer from './footer.react';
-// import Header from './header.react';
+import Footer from './footer.react';
+import Header from './header.react';
 import React from 'react';
+import flux from '../lib/flux';
+import store from './store';
 import {RouteHandler} from 'react-router';
-import {appState} from '../state';
-import {measureRender} from '../console';
+import {createValidate} from '../validate';
 
-// All stores must be imported here.
-import '../auth/store';
-import '../users/store';
+import * as authActions from '../auth/actions';
 
-class App extends Component {
+const actions = [authActions];
 
-  constructor(props) {
-    super(props);
-    this.state = this.getState();
-  }
+@flux(store)
+export default class App extends Component {
 
-  getState() {
-    const viewer = appState.get().getIn(['users', 'viewer']);
-    return appState.get().merge({
-      isLoggedIn: !!viewer,
-      viewer: viewer
-    }).toObject();
-  }
+  static propTypes = {
+    flux: React.PropTypes.object.isRequired,
+    msg: React.PropTypes.object.isRequired,
+    users: React.PropTypes.object.isRequired
+  };
 
-  // Why componentWillMount instead of componentDidMount.
-  // https://github.com/este/este/issues/274
   componentWillMount() {
-    if (!process.env.IS_BROWSER) return;
-    appState.on('change', () => {
-      measureRender(done => this.setState(this.getState(), done));
-    });
+    this.createActions();
+  }
+
+  createActions() {
+    const {flux, msg} = this.props;
+    const validate = createValidate(msg);
+    this.actions = actions.reduce((actions, {feature, create}) => {
+      const dispatch = (action, payload) => flux.dispatch(action, payload, {feature});
+      const featureActions = create(dispatch, validate, msg[feature]);
+      return {...actions, [feature]: featureActions};
+    }, {});
   }
 
   render() {
+    const props = {...this.props, actions: this.actions};
+    const {users: {viewer}, msg} = props;
+
     return (
       <div className="page">
-        {/*<Header isLoggedIn={this.state.isLoggedIn} />*/}
-        <RouteHandler {...this.state} />
-        {/*<Footer />*/}
+        {/* Pass only what's needed. Law of Demeter ftw. */}
+        <Header msg={msg} viewer={viewer} />
+        <RouteHandler {...props} />
+        <Footer msg={msg} />
       </div>
     );
   }
 
 }
-
-export default App;

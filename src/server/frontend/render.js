@@ -1,4 +1,3 @@
-import * as state from '../../client/state';
 import DocumentTitle from 'react-document-title';
 import Html from './html.react';
 import Promise from 'bluebird';
@@ -10,8 +9,8 @@ import initialState from '../initialstate';
 import routes from '../../client/routes';
 import stateMerger from '../lib/merger';
 
-export default function render(req, res, userState = {}) {
-  const appState = immutable.fromJS(initialState).mergeWith(stateMerger, userState).toJS();
+export default function render(req, res, ...customStates) {
+  const appState = immutable.fromJS(initialState).mergeWith(stateMerger, ...customStates).toJS();
   return renderPage(req, res, appState);
 }
 
@@ -36,7 +35,7 @@ function renderPage(req, res, appState) {
     });
 
     router.run((Handler, routerState) => {
-      const html = loadAppStateThenRenderHtml(Handler, appState);
+      const html = getPageHtml(Handler, appState);
       const notFound = routerState.routes.some(route => route.name === 'not-found');
       const status = notFound ? 404 : 200;
       res.status(status).send(html);
@@ -46,18 +45,15 @@ function renderPage(req, res, appState) {
   });
 }
 
-function loadAppStateThenRenderHtml(Handler, appState) {
-  state.appState.load(appState);
-  return getPageHtml(Handler, appState);
-}
-
 function getPageHtml(Handler, appState) {
-  const appHtml = `<div id="app">${React.renderToString(<Handler />)}</div>`;
+  const appHtml = `<div id="app">${
+    React.renderToString(<Handler initialState={appState} />)
+  }</div>`;
+
   const appScriptSrc = config.isProduction
     ? '/build/app.js?v=' + config.version
     : '//localhost:8888/build/app.js';
 
-  // Serialize app state for client.
   let scriptHtml = `
     <script>
       (function() {
