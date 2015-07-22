@@ -1,6 +1,6 @@
 {
-  "name": "este-bare",
-  "description": "The most complete dev stack for React/Flux universal web apps.",
+  "name": "este-base",
+  "description": "Bare Este",
   "author": "Daniel Steigerwald",
   "version": "10.0.0",
   "private": true,
@@ -29,7 +29,7 @@
     "css-loader": "^0.15.2",
     "del": "^1.1.1",
     "eslint": "^0.24.0",
-    "eslint-plugin-react": "^2.6.3",
+    "eslint-plugin-react": "^3.0.0",
     "eventemitter3": "^1.0.1",
     "express": "^4.11.2",
     "extract-text-webpack-plugin": "^0.8.0",
