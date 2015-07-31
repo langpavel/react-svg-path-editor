@@ -1,17 +1,33 @@
 .svg-editor
   box-sizing border-box
 
-  .viewBox-editor
-    .name-value
-      display inline-block
-      label
-        span
-          display inline-block
+  .background-file
+    display inline-block
 
-      input
-        width 60px
-        text-align right
-        border none
+  .viewBox-editor
+    display inline-block
+
+  .name-value
+    display inline-block
+    label
+      span
+        display inline-block
+
+    input
+      width 60px
+      text-align right
+      border none
+
+  .work-area
+    position relative
+
+    > *
+      position absolute
+      left 0
+      top 0
+    img.background
+      opacity 0.5
+      image-rendering pixelated
 
   textarea
     width 100%
