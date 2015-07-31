@@ -20,7 +20,7 @@ export default class SvgEditor extends React.Component {
   }
 
   getSvgPath() {
-    return this.state.path;
+    return this.state.path.replace(/\/\/.*\n/g, '');
   }
 
   getViewBox() {
