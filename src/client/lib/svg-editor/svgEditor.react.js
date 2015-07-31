@@ -28,8 +28,8 @@ export default class SvgEditor extends React.Component {
     return `${viewBoxMinX || 0} ${viewBoxMinY || 0} ${viewBoxWidth || 0} ${viewBoxHeight || 0}`;
   }
 
-  getDownloadName() {
-    return (this.state.name || 'svg') + '.svg'
+  getDownloadBaseName() {
+    return (this.state.name || 'untitled');
   }
 
   render() {
@@ -145,14 +145,13 @@ export default class SvgEditor extends React.Component {
             <path d={this.getSvgPath()} />
           </svg>
 
-          <a href={this.createSaveURL()} download={this.getDownloadName()}>
+          <a href={this.createSaveURL()} download={this.getDownloadBaseName() + '.svg'}>
             <svg
               className="preview"
               width={this.state.viewBoxWidth}
               height={this.state.viewBoxHeight}
               viewBox={viewBox}
               style={svgStyle}
-              onClick={() => this.save()}
             >
               <path d={this.getSvgPath()} />
             </svg>
@@ -192,8 +191,12 @@ export default class SvgEditor extends React.Component {
   createSaveURL() {
     if (!process.env.IS_BROWSER)
       return;
+
     const svgContent = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
       <svg
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:cc="http://creativecommons.org/ns#"
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
         xmlns:svg="http://www.w3.org/2000/svg"
         xmlns="http://www.w3.org/2000/svg"
         version="1.0"
@@ -202,6 +205,17 @@ export default class SvgEditor extends React.Component {
         viewBox="${this.getViewBox()}"
         style="fill:#777777;fill-rule:evenodd;stroke:#000000;stroke-width:1px"
       >
+        <metadata>
+          <source><![CDATA[\n${this.state.path}\n]]></source>
+          <rdf:RDF>
+            <cc:Work rdf:about="">
+              <dc:format>image/svg+xml</dc:format>
+              <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+              <dc:title>${this.getDownloadBaseName()}</dc:title>
+              <dc:description></dc:description>
+            </cc:Work>
+          </rdf:RDF>
+        </metadata>
         <defs />
         <path d="${this.getSvgPath().replace(/\s+/g,' ')}" />
       </svg>
