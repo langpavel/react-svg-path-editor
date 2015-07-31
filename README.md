@@ -1,2 +1,3 @@
-# este-bare
-Bare Este. Not always up to date.
+# react-svg-path-editor
+
+Based on [este-bare](https://github.com/este/bare)

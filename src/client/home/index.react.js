@@ -1,22 +1,20 @@
 import Component from '../components/component.react';
 import DocumentTitle from 'react-document-title';
 import React from 'react';
+import SvgEditor from '../lib/svg-editor/svgEditor.react';
+import './home.styl';
 
-export default class Index extends Component {
+export default class Index extends React.Component {
 
   static propTypes = {
     msg: React.PropTypes.object.isRequired
   };
 
   render() {
-    const {msg: {home: msg}} = this.props;
-
     return (
-      <DocumentTitle title={msg.title}>
+      <DocumentTitle title="SVG Path Editor">
         <div className="home-page">
-          <p>
-            Your app here.
-          </p>
+          <SvgEditor />
         </div>
       </DocumentTitle>
     );

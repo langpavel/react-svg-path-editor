@@ -42,9 +42,9 @@ export default class App extends Component {
     return (
       <div className="page">
         {/* Pass only what's needed. Law of Demeter ftw. */}
-        <Header msg={msg} viewer={viewer} />
+        {/* <Header msg={msg} viewer={viewer} /> */}
         <RouteHandler {...props} />
-        <Footer msg={msg} />
+        {/* <Footer msg={msg} /> */}
       </div>
     );
   }

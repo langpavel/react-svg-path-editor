@@ -1,4 +1,3 @@
 export default {
-  title: 'Este.js App',
-  todos: 'todos'
+  title: 'SVG Path Editor',
 };
