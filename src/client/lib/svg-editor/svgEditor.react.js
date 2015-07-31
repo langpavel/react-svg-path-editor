@@ -19,19 +19,23 @@ export default class SvgEditor extends React.Component {
     this.setState({path});
   }
 
+  getSvgPath() {
+    return this.state.path;
+  }
+
   getViewBox() {
     const {viewBoxMinX, viewBoxMinY, viewBoxWidth, viewBoxHeight} = this.state;
     return `${viewBoxMinX || 0} ${viewBoxMinY || 0} ${viewBoxWidth || 0} ${viewBoxHeight || 0}`;
+  }
+
+  getDownloadName() {
+    return (this.state.name || 'svg') + '.svg'
   }
 
   render() {
     const {path, backgroundImage} = this.state || {};
     const viewBox = this.getViewBox();
     const svgStyle = {
-      strokeWidth: 1,
-      stroke: 'rgba(0,0,0,0.7)',
-      fill: 'rgba(0,0,0,0.1)',
-      fillRule: 'evenodd',
     };
 
     return (
@@ -54,7 +58,7 @@ export default class SvgEditor extends React.Component {
         <div className="background-file">
           <label>
             <span>background:</span>
-            <input type="file" accept="image/*" onChange={(e) => this.uploadFile(e)} />
+            <input type="file" accept="image/*" onChange={(e) => this.loadBackground(e)} />
           </label>
         </div>
         <div className="viewBox-editor">
@@ -120,7 +124,7 @@ export default class SvgEditor extends React.Component {
           name="svgPath"
           cols="30"
           rows="10"
-          path={path}
+          defaultValue={path}
           onChange={({target: {value}}) => this.setSvgPath(value)}
         />
         <div className="work-area">
@@ -138,23 +142,37 @@ export default class SvgEditor extends React.Component {
             viewBox={viewBox}
             style={svgStyle}
           >
-            <path d={path} />
+            <path d={this.getSvgPath()} />
           </svg>
+
+          <a href={this.createSaveURL()} download={this.getDownloadName()}>
+            <svg
+              className="preview"
+              width={this.state.viewBoxWidth}
+              height={this.state.viewBoxHeight}
+              viewBox={viewBox}
+              style={svgStyle}
+              onClick={() => this.save()}
+            >
+              <path d={this.getSvgPath()} />
+            </svg>
+          </a>
+
         </div>
       </div>
     );
   }
 
-  uploadFile(e) {
+  loadBackground(e) {
     const {target} = e;
     const file = target.files && target.files[0];
 
     if (file && FileReader) {
         var fr = new FileReader();
         fr.onload = () => {
-            console.log('file', fr.result);
             this.setState({
-              backgroundImage: fr.result
+              backgroundImage: fr.result,
+              name: file.name && file.name.replace(/\.[^.]+$/, ''),
             }, () => this.onBackgroundImageSet());
         }
         fr.readAsDataURL(file);
@@ -169,6 +187,25 @@ export default class SvgEditor extends React.Component {
       viewBoxWidth: naturalWidth,
       viewBoxHeight: naturalHeight,
     });
+  }
+
+  createSaveURL() {
+    const svgContent = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+      <svg
+        xmlns:svg="http://www.w3.org/2000/svg"
+        xmlns="http://www.w3.org/2000/svg"
+        version="1.0"
+        width="${this.state.viewBoxWidth}"
+        height="${this.state.viewBoxHeight}"
+        viewBox="${this.getViewBox()}"
+        style="fill:#777777;fill-rule:evenodd;stroke:#000000;stroke-width:1px"
+      >
+        <defs />
+        <path d="${this.getSvgPath().replace(/\s+/g,' ')}" />
+      </svg>
+    `;
+    const file = new Blob([svgContent], {type: 'image/svg+xml'});
+    return URL.createObjectURL(file);
   }
 
 }

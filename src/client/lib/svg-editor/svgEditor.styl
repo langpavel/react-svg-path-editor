@@ -21,13 +21,26 @@
   .work-area
     position relative
 
-    > *
+    img.background
       position absolute
       left 0
       top 0
-    img.background
       opacity 0.5
       image-rendering pixelated
+      background-color #ffc
+
+    svg.surface
+      position absolute
+      left 0
+      top 0
+      stroke-width 0.3px
+      stroke rgba(0,0,0,0.7)
+      fill rgba(0,0,0,0.1)
+
+    svg.preview
+      position absolute
+      right 0
+      top 0
 
   textarea
     width 100%
@@ -35,3 +48,7 @@
 
   svg
     border 1px #aaa solid
+    stroke-width 0px
+    stroke #000
+    fill #000
+    fill-rule evenodd
