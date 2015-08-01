@@ -12,6 +12,8 @@ export default class SvgEditor extends React.Component {
       viewBoxWidth: 40,
       viewBoxHeight: 40,
       zoom: 5,
+      mouseX: null,
+      mouseY: null,
     };
   }
 
@@ -124,10 +126,13 @@ export default class SvgEditor extends React.Component {
           name="svgPath"
           cols="30"
           rows="10"
-          defaultValue={path}
+          value={path}
           onChange={({target: {value}}) => this.setSvgPath(value)}
         />
-        <div className="work-area">
+        <div className="work-area"
+          onClick={(e) => this.svgMouseDown(e)}
+          onMouseMove={(e) => this.svgMouseMove(e)}
+        >
           {backgroundImage && <img
             ref="background"
             className="background"
@@ -136,6 +141,7 @@ export default class SvgEditor extends React.Component {
             height={this.state.viewBoxHeight * this.state.zoom}
           />}
           <svg
+            ref="svgSurface"
             className="surface"
             width={this.state.viewBoxWidth * this.state.zoom}
             height={this.state.viewBoxHeight * this.state.zoom}
@@ -143,6 +149,7 @@ export default class SvgEditor extends React.Component {
             style={svgStyle}
           >
             <path d={this.getSvgPath()} />
+            {this.getCursorPath()}
           </svg>
 
           <a href={this.createSaveURL()} download={this.getDownloadBaseName() + '.svg'}>
@@ -186,6 +193,54 @@ export default class SvgEditor extends React.Component {
       viewBoxWidth: naturalWidth,
       viewBoxHeight: naturalHeight,
     });
+  }
+
+  calculateMousePosition(e, round) {
+    const svg = React.findDOMNode(this.refs.svgSurface);
+    const svgRect = svg.getBoundingClientRect();
+    const {zoom, viewBoxMinX, viewBoxMinY} = this.state;
+    let x = ((e.clientX - svgRect.left) / zoom) + viewBoxMinX;
+    let y = ((e.clientY - svgRect.top) / zoom) + viewBoxMinY;
+    if (round) {
+      x = Math.round(x);
+      y = Math.round(y);
+    }
+    return {x, y};
+  }
+
+  svgMouseMove(e) {
+    const pos = this.calculateMousePosition(e, true);
+    this.setState({
+      mouseX: pos.x,
+      mouseY: pos.y,
+    });
+  }
+
+  svgMouseDown(e) {
+    const pos = this.calculateMousePosition(e, true);
+    this.setState({
+      path: `${this.state.path} L${pos.x.toFixed(0)},${pos.y.toFixed(0)}`,
+    });
+  }
+
+  getCursorPath() {
+    const {
+      mouseX,
+      mouseY,
+      viewBoxMinX,
+      viewBoxMinY,
+      viewBoxWidth,
+      viewBoxHeight,
+    } = this.state;
+    if (mouseX === null)
+      return null;
+    const cursorPath = [];
+    cursorPath.push('M', mouseX, viewBoxMinY);
+    cursorPath.push('v', viewBoxHeight);
+    cursorPath.push('M', viewBoxMinX, mouseY);
+    cursorPath.push('h', viewBoxWidth);
+
+    return <path className="mouse-cursor" d={cursorPath.join(' ')} />;
   }
 
   createSaveURL() {
