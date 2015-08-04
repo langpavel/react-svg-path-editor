@@ -129,10 +129,7 @@ export default class SvgEditor extends React.Component {
           value={path}
           onChange={({target: {value}}) => this.setSvgPath(value)}
         />
-        <div className="work-area"
-          onClick={(e) => this.svgMouseDown(e)}
-          onMouseMove={(e) => this.svgMouseMove(e)}
-        >
+        <div className="work-area">
           {backgroundImage && <img
             ref="background"
             className="background"
@@ -140,17 +137,22 @@ export default class SvgEditor extends React.Component {
             width={this.state.viewBoxWidth * this.state.zoom}
             height={this.state.viewBoxHeight * this.state.zoom}
           />}
-          <svg
-            ref="svgSurface"
-            className="surface"
-            width={this.state.viewBoxWidth * this.state.zoom}
-            height={this.state.viewBoxHeight * this.state.zoom}
-            viewBox={viewBox}
-            style={svgStyle}
+          <div
+            onClick={(e) => this.svgMouseDown(e)}
+            onMouseMove={(e) => this.svgMouseMove(e)}
           >
-            <path d={this.getSvgPath()} />
-            {this.getCursorPath()}
-          </svg>
+            <svg
+              ref="svgSurface"
+              className="surface"
+              width={this.state.viewBoxWidth * this.state.zoom}
+              height={this.state.viewBoxHeight * this.state.zoom}
+              viewBox={viewBox}
+              style={svgStyle}
+            >
+              <path d={this.getSvgPath()} />
+              {this.getCursorPath()}
+            </svg>
+          </div>
 
           <a href={this.createSaveURL()} download={this.getDownloadBaseName() + '.svg'}>
             <svg
